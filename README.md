@@ -1,4 +1,3 @@
-# Research-for-University-Project
 # **Fitness App Analysis Project**
 
 ## **Overview**
@@ -6,25 +5,68 @@ This project analyzes Google Play Store data to derive insights into the fitness
 
 ---
 
+## **Data Source**
+The dataset used for this project was obtained from [Google Play Store Dataset](https://www.kaggle.com/lava18/google-play-store-apps) available on Kaggle. It contains details about over 10,000 apps, including their category, ratings, reviews, size, type (free/paid), price, installs, and other metadata.
+
+### Key Details:
+- **Number of Records**: 10,841
+- **Columns**: 13, including `App`, `Category`, `Rating`, `Reviews`, `Size`, `Installs`, `Type`, and more.
+- **Target**: The focus was primarily on apps in the `Health & Fitness` category.
+
+---
+
 ## **Data Cleaning Process**
-The dataset provided contained raw data with inconsistencies, null values, and unclean formats. Here’s the step-by-step process undertaken to clean and prepare the data for analysis:
+The raw dataset contained inconsistencies such as missing values, improper formatting, and mixed data types. Below are the key steps performed in **Python** for cleaning the data:
 
 1. **Handle Missing Values**:
-   - Identified columns with missing values (`Current Ver`, `Android Ver`) and replaced them with appropriate defaults or used forward/backward filling methods.
+   - Checked for null values in all columns using `df.isnull().sum()`.
+   - Columns with minimal missing values (`Current Ver`, `Android Ver`) were forward/backward-filled.
+   - For `Rating`, missing values were filled with the category-wise average rating.
 
-2. **Standardizing Columns**:
-   - Converted `Installs` column by removing non-numeric characters (like `+` and `,`) and cast it to numeric type.
-   - Cleaned the `Size` column by converting sizes (e.g., MB, KB) to a standard numeric format (all in MB).
+2. **Data Type Standardization**:
+   - Converted the `Installs` column:
+     - Removed special characters like `+` and `,` using `.str.replace()`.
+     - Cast to numeric type using `.astype(float)`.
+   - Processed the `Price` column:
+     - Removed the `$` symbol.
+     - Converted to numeric for analysis.
+   - Cleaned the `Reviews` column:
+     - Ensured all entries were integers and removed non-numeric anomalies.
 
-3. **Parsing Dates**:
-   - The `Last Updated` column was converted to datetime format.
-   - Extracted the year from `Last Updated` to create a new column called `InstallYear` for trend analysis.
+3. **Size Standardization**:
+   - Converted app sizes from mixed units (e.g., MB, KB) into a unified numeric format in MB.
+   - Used a custom function to handle conversions:
+     ```python
+     def convert_size(size):
+         if 'M' in size:
+             return float(size.replace('M', ''))
+         elif 'K' in size:
+             return float(size.replace('K', '')) / 1024
+         else:
+             return np.nan
+     df['Size'] = df['Size'].apply(convert_size)
+     ```
 
-4. **Numeric Conversion**:
-   - Converted `Reviews` and `Price` columns to numeric types after removing unwanted characters.
+4. **Datetime Parsing**:
+   - Converted `Last Updated` to a datetime format using `pd.to_datetime()`.
+   - Extracted the year from `Last Updated` to create a new `InstallYear` column for time trend analysis.
 
 5. **Categorization**:
-   - Created a new `Free vs Paid` column by categorizing apps as either `Free` or `Paid` based on the `Price` column.
+   - Created a new column, `Free vs Paid`, by checking if the `Price` column was greater than 0.
+     ```python
+     df['Free vs Paid'] = df['Price'].apply(lambda x: 'Free' if x == 0 else 'Paid')
+     ```
+
+6. **Duplicate Removal**:
+   - Identified and removed duplicate entries based on the `App` column.
+
+7. **Target Filtering**:
+   - Isolated apps from the `Health & Fitness` category into a separate DataFrame (`fitness_apps`) for specific analysis.
+
+### **Final Cleaned Dataset**
+After cleaning, the dataset contained:
+- **Columns**: 15 (including new calculated features).
+- **Rows**: 10,841 (no loss in records due to cleaning).
 
 ---
 
@@ -60,14 +102,12 @@ To enhance the insights and perform meaningful comparisons, new calculated featu
    - Calculates the average rating for apps in each category.
    - **Purpose**: Compare satisfaction levels across app categories.
 
-8. **Free vs Paid**:
-   - Indicates whether an app is `Free` or `Paid`.
-   - **Purpose**: Identify the proportion of free and paid apps and analyze their installs.
-
 ---
+
 ## **Visualization Insights**
-Using **Power BI**, the following visualizations were created to interpret the data in this visual:
-![Uploading fitness app data visualisation .png…]()
+Using **Power BI**, the following visualizations were created to interpret the data:
+![Fitness App Data Visualization](fitness%20app%20data%20visualisation.png)
+
 1. **Installs By Category**:
    - **Type**: Bar Chart
    - **Purpose**: Compare total installs across all app categories and highlight the position of `Health & Fitness`.
@@ -96,3 +136,5 @@ Using **Power BI**, the following visualizations were created to interpret the d
 
 ## **Conclusion**
 This project provides actionable insights into the fitness app industry by leveraging data analysis and visualization techniques. The calculated features and dashboards demonstrate the growth, user satisfaction, and engagement trends, making a strong case for developing a fitness app tailored to user preferences.
+
+---
