@@ -106,7 +106,7 @@ To enhance the insights and perform meaningful comparisons, new calculated featu
 
 ## **Visualization Insights**
 Using **Power BI**, the following visualizations were created to interpret the data:
-![Fitness App Data Visualization](fitness%20app%20data%20visualisation.png)
+![Fitness App Data Visualization](fitnessappdatavisualisation.png)
 
 1. **Installs By Category**:
    - **Type**: Bar Chart
